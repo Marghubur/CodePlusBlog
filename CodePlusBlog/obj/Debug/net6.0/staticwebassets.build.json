@@ -1,0 +1,19 @@
+{
+  "Version": 1,
+  "Hash": "S5HEgCBInvIpUCFoF9i/NaFcckouYgwuNExQiaV4gt4=",
+  "Source": "CodePlusBlog",
+  "BasePath": "_content/CodePlusBlog",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "CodePlusBlog\\wwwroot",
+      "Source": "CodePlusBlog",
+      "ContentRoot": "E:\\my_workspace\\webApi\\CodePlusBlog\\CodePlusBlog\\wwwroot\\",
+      "BasePath": "_content/CodePlusBlog",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": []
+}
