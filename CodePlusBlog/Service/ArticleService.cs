@@ -40,8 +40,11 @@ namespace CodePlusBlog.Service
                         _fileService.SaveFile(path, fileDetail, files, fileDetail[0].FileName);
                         contentList.ImgPath = Path.Combine(path, fileDetail[0].FileName);
                     }
-                    _fileService.SaveTextFile(path, contentList.BodyContent, contentList.Type + "_" + contentList.Part);
-                    contentList.FilePath = Path.Combine(path, contentList.Type + "_" + contentList.Part + ".txt");
+
+                    string txtFileName = contentList.Type + "_" + GetRandomNumber();
+                    _fileService.SaveTextFile(path, contentList.BodyContent, txtFileName);
+                    contentList.FilePath = Path.Combine(path, txtFileName + ".txt");
+
                     if (contentList.ContentId == 0)
                         result = await AddArcticleDetail(contentList);
                     else
@@ -82,6 +85,12 @@ namespace CodePlusBlog.Service
             await _context.contentlist.AddAsync(contentList);
             await _context.SaveChangesAsync();
             return "content added successfully";
+        }
+
+        private string GetRandomNumber()
+        {
+            var rnd = new Random();
+            return rnd.Next(ApplicationConstant.MinRandomValue, ApplicationConstant.MaxRandomValue).ToString();
         }
 
         private async Task<string> UpdateArcticleDetail(ContentList contentList)
@@ -151,6 +160,7 @@ namespace CodePlusBlog.Service
             var content = await _context.contentlist.FirstOrDefaultAsync(x => x.ContentId == contentList.ContentId);
             if (content == null)
                 throw new Exception("Content detail not found");
+
             content.IsPublish = contentList.IsPublish;
             if (content.IsPublish)
                 content.PublishOn = DateTime.Now;
