@@ -41,7 +41,7 @@ namespace CodePlusBlog.Service
                         contentList.ImgPath = Path.Combine(path, fileDetail[0].FileName);
                     }
 
-                    string txtFileName = contentList.Type + "_" + GetRandomNumber();
+                    string txtFileName = contentList.Type + "_" + GetRandomNumber() + contentList.Part;
                     _fileService.SaveTextFile(path, contentList.BodyContent, txtFileName);
                     contentList.FilePath = Path.Combine(path, txtFileName + ".txt");
 

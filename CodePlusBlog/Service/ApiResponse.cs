@@ -27,15 +27,5 @@ namespace CodePlusBlog.Service
         public ApiResponse()
         {
         }
-
-        public static ApiResponse BuilRequest(dynamic data)
-        {
-            ApiResponse apiResponse = new ApiResponse();
-            apiResponse.ResponseBody = data;
-            apiResponse.StatusCode = (int)HttpStatusCode.OK;
-            apiResponse.Token = null;
-            apiResponse.StatusMessage = "Successfull";
-            return apiResponse;
-        }
     }
 }

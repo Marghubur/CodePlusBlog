@@ -35,31 +35,9 @@ namespace CodePlusBlog.Service
                 {
                     var path = "Notes";
                     if (notesDetail.NoteId == 0)
-                    {
-                        var lastNote = await _context.notesDetails.OrderBy(x => x.NoteId).LastOrDefaultAsync();
-                        if (lastNote == null)
-                            notesDetail.NoteId = 1;
-                        else
-                            notesDetail.NoteId = lastNote.NoteId + 1;
-
-                        _fileService.SaveTextFile(path, notesDetail.Content, "Notes_" + notesDetail.NoteId);
-                        notesDetail.FilePath = Path.Combine(path, "Notes_" + notesDetail.NoteId + ".txt");
-                        await _context.notesDetails.AddAsync(notesDetail);
-                        await _context.SaveChangesAsync();
-                    }
+                        await AddNotesDetail(notesDetail, path);
                     else
-                    {
-                        var note = await _context.notesDetails.FirstOrDefaultAsync(x => x.NoteId == notesDetail.NoteId);
-                        if (note == null)
-                            throw new Exception("Notes detail not found");
-
-                        _fileService.SaveTextFile(path, notesDetail.Content, "Notes_" + notesDetail.NoteId);
-                        note.FilePath = Path.Combine(path, "Notes_" + notesDetail.NoteId + ".txt");
-                        note.Title = notesDetail.Title;
-
-                        await _context.SaveChangesAsync();
-                    }
-
+                        await UpdateNotesDetail(notesDetail, path);
 
                     transaction.Commit(); // Commit the transaction if successful
                     return await GetAllNotesService();
@@ -73,6 +51,41 @@ namespace CodePlusBlog.Service
                     throw;
                 }
             }
+        }
+
+        private async Task AddNotesDetail(NotesDetail notesDetail, string path)
+        {
+            var lastNote = await _context.notesDetails.OrderBy(x => x.NoteId).LastOrDefaultAsync();
+            if (lastNote == null)
+                notesDetail.NoteId = 1;
+            else
+                notesDetail.NoteId = lastNote.NoteId + 1;
+
+            string notesFileName = "Notes_" + GetRandomNumber();
+            _fileService.SaveTextFile(path, notesDetail.Content, notesFileName);
+            notesDetail.FilePath = Path.Combine(path, notesFileName + ".txt");
+            await _context.notesDetails.AddAsync(notesDetail);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task UpdateNotesDetail(NotesDetail notesDetail, string path)
+        {
+            var note = await _context.notesDetails.FirstOrDefaultAsync(x => x.NoteId == notesDetail.NoteId);
+            if (note == null)
+                throw new Exception("Notes detail not found");
+
+            string notesFileName = "Notes_" + GetRandomNumber();
+            _fileService.SaveTextFile(path, notesDetail.Content, notesFileName);
+            note.FilePath = Path.Combine(path, notesFileName + ".txt");
+            note.Title = notesDetail.Title;
+
+            await _context.SaveChangesAsync();
+        }
+
+        private string GetRandomNumber()
+        {
+            var rnd = new Random();
+            return rnd.Next(ApplicationConstant.MinRandomValue, ApplicationConstant.MaxRandomValue).ToString();
         }
 
         public async Task<List<NotesDetail>> GetAllNotesService()

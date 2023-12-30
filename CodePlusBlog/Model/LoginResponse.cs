@@ -2,8 +2,8 @@
 {
     public class LoginResponse
     {
-        public User user { get; set; }
+        public User User { get; set; }
         public string Token { get; set; }
-        public List<Menu> menu { get; set; }
+        public List<Menu> Menu { get; set; }
     }
 }

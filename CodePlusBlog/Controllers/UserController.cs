@@ -36,5 +36,19 @@ namespace CodePlusBlog.Controllers
             var result = await _userService.ForgotPasswordService(email);
             return new ApiResponse(result);
         }
+
+        [HttpGet("GenerateOTP/{email}")]
+        public async Task<ApiResponse> GenerateOTP([FromRoute] string email)
+        {
+            var result = await _userService.GenerateOtp(email);
+            return new ApiResponse(result);
+        }
+
+        [HttpPost("ChangePassword")]
+        public async Task<ApiResponse> ChangePassword([FromBody] User user)
+        {
+            var result = await _userService.ChangePasswordService(user);
+            return new ApiResponse(result);
+        }
     }
 }

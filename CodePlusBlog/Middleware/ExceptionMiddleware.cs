@@ -33,7 +33,7 @@ namespace CodePlusBlog.Middleware
             context.Response.ContentType = MediaTypeNames.Application.Json;
 
             var response = _environment.IsDevelopment() ?
-                new ApiResponse(ex.StackTrace.ToString(), context.Response.StatusCode, ex.Message)
+                new ApiResponse(ex.Message, context.Response.StatusCode, ex.StackTrace.ToString())
                 : new ApiResponse(ex.Message, context.Response.StatusCode);
 
             var json = JsonConvert.SerializeObject(response);

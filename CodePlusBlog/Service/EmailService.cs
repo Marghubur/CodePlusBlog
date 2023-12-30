@@ -25,9 +25,9 @@ namespace ServiceLayer.Service
                 mail.IsBodyHtml = true;
                 mail.Priority = MailPriority.High;
                 mail.From = new MailAddress("marghub12@rediffmail.com", "Testing", Encoding.UTF8);
-                _client.Port = 25;
+                _client.Port = 587;
                 _client.Host = "smtp.rediffmail.com";
-                _client.Credentials = new NetworkCredential("marghub12@rediffmail.com", "8293437694");
+                _client.Credentials = new NetworkCredential("marghub12@rediffmail.com", "q1mbtjgxhv4okg0kog");
                 _client.EnableSsl = true;
                 _client.UseDefaultCredentials = false;
                 await _client.SendMailAsync(mail);

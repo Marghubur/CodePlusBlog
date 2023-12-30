@@ -1,4 +1,5 @@
 using CodePlusBlog.Context;
+using CodePlusBlog.CRONService;
 using CodePlusBlog.IService;
 using CodePlusBlog.Middleware;
 using CodePlusBlog.Service;
@@ -63,7 +64,6 @@ builder.Services.AddAuthentication(x =>
     };
 });
 builder.Services.AddAuthorization();
-builder.Services.AddSingleton<ICloudinaryImageService, CloudinaryImageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 var connectionString = builder.Configuration.GetConnectionString("Connection");
 builder.Services.AddDbContext<RepositoryContext>(x => x.UseMySql(connectionString, MySqlServerVersion.LatestSupportedServerVersion));
@@ -77,6 +77,8 @@ builder.Services.AddScoped<INotesService, NotesService>();
 builder.Services.AddMvc();
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddHostedService<OtpCleanupService>();
+builder.Services.AddDistributedMemoryCache();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -85,7 +87,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseHttpsRedirection();
 app.UseCors();
 app.UseStaticFiles();
 app.UseMiddleware<JwtMiddleware>();
