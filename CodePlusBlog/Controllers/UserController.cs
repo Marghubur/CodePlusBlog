@@ -1,7 +1,9 @@
-﻿using CodePlusBlog.IService;
+﻿using CodePlusBlog.Filter;
+using CodePlusBlog.IService;
 using CodePlusBlog.Model;
 using CodePlusBlog.Service;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CodePlusBlog.Controllers
 {
@@ -10,7 +12,6 @@ namespace CodePlusBlog.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-
         public UserController(IUserService userService)
         {
             _userService = userService;
@@ -38,6 +39,8 @@ namespace CodePlusBlog.Controllers
         }
 
         [HttpGet("GenerateOTP/{email}")]
+        [RateLimit]
+        //[ServiceFilter(typeof(RateLimitAttribute))]
         public async Task<ApiResponse> GenerateOTP([FromRoute] string email)
         {
             var result = await _userService.GenerateOtp(email);

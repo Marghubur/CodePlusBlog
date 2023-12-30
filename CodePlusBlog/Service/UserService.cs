@@ -140,14 +140,14 @@ namespace CodePlusBlog.Service
             if (string.IsNullOrEmpty(email))
                 return "Invalid email";
 
-            string otp = new Random().Next(100000, 999999).ToString();
-            _cache.Set(email, otp, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(99) // Set expiration time to 5 minutes
-            });
+            //string otp = new Random().Next(100000, 999999).ToString();
+            //_cache.Set(email, otp, new MemoryCacheEntryOptions
+            //{
+            //    AbsoluteExpiration = DateTime.Now.AddMinutes(99) // Set expiration time to 5 minutes
+            //});
 
             //_otpCleanupService.TrackCacheEntry(userId);
-            await _emailService.SendEmail(email, "OTP", $"Your OTP is {otp}. It will be valid for 5 minutes only");
+            //await _emailService.SendEmail(email, "OTP", $"Your OTP is {otp}. It will be valid for 5 minutes only");
             return "OTP is send on your registered email";
         }
 

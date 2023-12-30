@@ -1,5 +1,6 @@
 using CodePlusBlog.Context;
 using CodePlusBlog.CRONService;
+using CodePlusBlog.Filter;
 using CodePlusBlog.IService;
 using CodePlusBlog.Middleware;
 using CodePlusBlog.Service;
@@ -78,7 +79,8 @@ builder.Services.AddMvc();
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddHostedService<OtpCleanupService>();
-builder.Services.AddDistributedMemoryCache();
+//builder.Services.AddMemoryCache();
+//builder.Services.AddScoped<RateLimitAttribute>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

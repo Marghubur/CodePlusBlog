@@ -1,57 +1,97 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CodePlusBlog.Service;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace CodePlusBlog.Filter
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class RateLimitAttribute: ActionFilterAttribute
+    public class RateLimitAttribute : ActionFilterAttribute
     {
-        private readonly IDistributedCache _cache;
+        private static readonly Dictionary<string, Tuple<int, DateTime>> UserLimits = new Dictionary<string, Tuple<int, DateTime>>();
+        private const int MaxRequests = 3;
+        private static readonly TimeSpan RateLimitDuration = TimeSpan.FromHours(24);
 
-        public RateLimitAttribute(IDistributedCache cache)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            _cache = cache ?? throw new Exception(nameof(cache));
-        }
+            string email = context.ActionArguments["email"].ToString();
 
-        public override async void OnActionExecuting(ActionExecutingContext context)
-        {
-            var userId = context.HttpContext.User.Identity.Name; // Replace this with your actual user identifier logic.
-
-            if (!string.IsNullOrEmpty(userId))
+            if (!string.IsNullOrEmpty(email))
             {
-                var cacheKey = $"ratelimit:{userId}";
-                var cacheEntry = await _cache.GetStringAsync(cacheKey);
-
-                if (string.IsNullOrEmpty(cacheEntry))
+                if (UserLimits.TryGetValue(email, out var userLimit))
                 {
-                    // First API call, set initial count and expiration
-                    await _cache.SetStringAsync(cacheKey, "1", new DistributedCacheEntryOptions
+                    var currentTime = DateTime.UtcNow;
+
+                    if (currentTime - userLimit.Item2 < RateLimitDuration)
                     {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(12)
-                    });
+                        if (userLimit.Item1 >= MaxRequests)
+                        {
+                            // User has exceeded the limit
+                            var response = new ApiResponse("Rate limit exceeded. Try again later.", (int)StatusCodes.Status429TooManyRequests);
+                            context.Result = new ObjectResult(response);
+                            return;
+                        }
+
+                        // Increment the count
+                        UserLimits[email] = new Tuple<int, DateTime>(userLimit.Item1 + 1, userLimit.Item2);
+                    }
+                    else
+                    {
+                        // Reset count for a new time window
+                        UserLimits[email] = new Tuple<int, DateTime>(1, currentTime);
+                    }
                 }
                 else
                 {
-                    var count = int.Parse(cacheEntry);
-
-                    if (count >= 3)
-                    {
-                        // User has exceeded the limit
-                        context.Result = new ContentResult
-                        {
-                            StatusCode = 429, // 429 Too Many Requests
-                            Content = "Rate limit exceeded. Try again later."
-                        };
-                        return;
-                    }
-
-                    // Increment the count
-                    await _cache.SetStringAsync(cacheKey, (count + 1).ToString());
+                    // First API call for this user
+                    UserLimits[email] = new Tuple<int, DateTime>(1, DateTime.UtcNow);
                 }
             }
 
             base.OnActionExecuting(context);
         }
+
+        //private readonly IMemoryCache _cache;
+
+        //public RateLimitAttribute(IMemoryCache cache)
+        //{
+        //    _cache = cache ?? throw new ArgumentNullException(nameof(cache));
+        //}
+
+        //public override void OnActionExecuting(ActionExecutingContext context)
+        //{
+        //    string email = context.ActionArguments["email"].ToString();
+
+        //    if (!string.IsNullOrEmpty(email))
+        //    {
+        //        var cacheKey = $"ratelimit:{email}";
+
+        //        if (!_cache.TryGetValue(cacheKey, out int count))
+        //        {
+        //            // First API call, set initial count and expiration
+        //            _cache.Set(cacheKey, 1, new MemoryCacheEntryOptions
+        //            {
+        //                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+        //            });
+        //        }
+        //        else
+        //        {
+        //            if (count >= 3)
+        //            {
+        //                // User has exceeded the limit
+        //                var response = new ApiResponse("Rate limit exceeded. Try again later.", (int)StatusCodes.Status429TooManyRequests);
+        //                context.Result = new ObjectResult(response);
+        //                return;
+        //            }
+
+        //            // Increment the count
+        //            _cache.Set(cacheKey, count + 1, new MemoryCacheEntryOptions
+        //            {
+        //                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+        //            });
+        //        }
+        //    }
+
+        //    base.OnActionExecuting(context);
+        //}
     }
 }
