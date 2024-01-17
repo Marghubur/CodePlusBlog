@@ -24,7 +24,7 @@ namespace ServiceLayer.Service
                 mail.Body = body;
                 mail.IsBodyHtml = true;
                 mail.Priority = MailPriority.High;
-                mail.From = new MailAddress("marghub12@rediffmail.com", "Testing", Encoding.UTF8);
+                mail.From = new MailAddress("marghub12@rediffmail.com", "Marghub", Encoding.UTF8);
                 _client.Port = 587;
                 _client.Host = "smtp.rediffmail.com";
                 _client.Credentials = new NetworkCredential("marghub12@rediffmail.com", "q1mbtjgxhv4okg0kog");
