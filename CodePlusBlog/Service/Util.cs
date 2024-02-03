@@ -79,7 +79,7 @@ namespace ServiceLayer.Service
                     new Claim("Id", user.UserId.ToString()),
                     new Claim("User", JsonConvert.SerializeObject(user)),
                 }),
-                Expires = user.RememberMe ? DateTime.UtcNow.AddDays(1) : DateTime.UtcNow.AddSeconds(30),
+                Expires = user.RememberMe ? DateTime.UtcNow.AddDays(1) : DateTime.UtcNow.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
             };
             var token = tokenHandler.CreateToken(tokenDescrpitor);

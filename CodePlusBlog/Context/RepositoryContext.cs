@@ -15,5 +15,6 @@ namespace CodePlusBlog.Context
         public DbSet<Menu> menu { get; set; }
         public DbSet<ContentList> contentlist { get; set; }
         public DbSet<NotesDetail> notesDetails { get; set; }
+        //public DbSet<VideoDetail> videoDetails { get; set; }
     }
 }
